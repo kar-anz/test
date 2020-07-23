@@ -1,24 +1,90 @@
-$( document ).ready(function() {
-    $("#check1").click(
-		function(){
-			sendAjaxForm('result_form', 'register', '../wp-content/themes/your_theme/my/index1.php');
-			return false; 
-		}
-	);
+/*
+    Авторизация
+ */
+
+$('.check').click(function (e) {
+    e.preventDefault();
+
+    $(`input`).removeClass('error');
+
+    let login = $('input[name="login"]').val(),
+        passwordone = $('input[name="passwordone"]').val();
+
+    $.ajax({
+        url: 'vender/signin.php',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            login: login,
+            passwordone: password
+        },
+        success (data) {
+
+            if (data.status) {
+                document.location.href = '/profile.php';
+            } else {
+
+                if (data.type === 1) {
+                    data.fields.forEach(function (field) {
+                        $(`input[name="${field}"]`).addClass('error');
+                    });
+                }
+
+                $('.msg').removeClass('none').text(data.message);
+            }
+
+        }
+    });
+
 });
- 
-function sendAjaxForm(result_form, register, url) {
-    jQuery.ajax({
-        url:     url, //url страницы (action_ajax_form.php)
-        type:     "POST", //метод отправки
-        dataType: "html", //формат данных
-        data: jQuery("#"+register).serialize(),  // Сеарилизуем объект
-        success: function(response) { //Данные отправлены успешно
-        	result = jQuery.parseJSON(response);
-        	document.getElementById(result_form).innerHTML = "Имя: "+result.name+"<br>login: "+result.login+"<br>email: "+result.email+"<br>password: "+result.passwordone;
-    	},
-		    	error: function(response) { // Данные не отправлены
-    		document.getElementById(result_form).innerHTML = "Ошибка. Данные не отправленны.";
-    	}
- 	});
-}
+
+
+
+/*
+    Регистрация
+ */
+
+$('.check1').click(function (e) {
+    e.preventDefault();
+
+    $(`input`).removeClass('error');
+
+    let login = $('input[name="login"]').val(),
+        password = $('input[name="passwordone"]').val(),
+        name = $('input[name="name"]').val(),
+        email = $('input[name="email"]').val(),
+        passwordtwo = $('input[name="passwordtwo"]').val();
+
+    let formData = new FormData();
+    formData.append('login', login);
+    formData.append('password', password);
+    formData.append('passwordtwo', password_two);
+    formData.append('name', name);
+    formData.append('email', email);
+
+
+    $.ajax({
+        url: 'vender/signup.php',
+        type: 'POST',
+        dataType: 'json',
+        data: formData,
+        success (data) {
+
+            if (data.status) {
+                document.location.href = '/index1.php';
+            } else {
+
+                if (data.type === 1) {
+                    data.fields.forEach(function (field) {
+                        $(`input[name="${field}"]`).addClass('error');
+                    });
+                }
+
+                $('.msg').removeClass('none').text(data.message);
+
+            }
+
+        }
+    });
+
+});
